@@ -1,0 +1,126 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+{% set title = "Cookie consent content"|t('app') %}
+{% set fullPageForm = true %}
+
+{% block contextMenu %}
+    <div id="revision-btngroup" class="btngroup">
+        <div id="revision-btn" class="btn menubtn" data-icon="world">
+            {{ currentSite.name|t('site') }}
+        </div>
+        <div class="menu">
+            {% set siteGroups = craft.app.sites.getAllGroups() %}
+            {% for group in siteGroups %}
+                {% set groupSiteIds = group.getSiteIds() %}
+                {% if groupSiteIds %}
+                    {% if siteGroups|length > 1 %}<h6>{{ group.name|t('site') }}</h6>{% endif %}
+                    <ul class="padded">
+                        {% for siteId in groupSiteIds %}
+                            {% set site = craft.app.sites.getSiteById(siteId) %}
+                            <li>
+                                {% if siteId == currentSite.id %}
+                                    <a class="site-option sel">
+                                        <div class="status enabled"></div>{{ site.name|t('site') }}
+                                    </a>
+                                {% else %}
+                                    {% set url = url('craftcookieconsent', { site: site.handle }) %}
+                                    <a class="site-option" href="{{ url }}">
+                                        <div class="status enabled"></div>{{ site.name|t('site') }}
+                                    </a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="action" value="craft-cookie-consent/cookieconsent/save">
+    {{ redirectInput('craftcookieconsent') }}
+    <input type="hidden" name="siteId" value="{{ currentSite.id }}">
+
+    {{ forms.textField({
+        label: "Header"|t('app'),
+        id: 'cookieconsent-header',
+        name: 'header',
+        value: cookieConsent.header,
+        placeholder: "Cookies used on the website!"|t('app'),
+        required: true,
+        errors: cookieConsent.getErrors('header'),
+    }) }}
+
+    {{ forms.textareaField({
+        label: "Message"|t('app'),
+        id: 'cookieconsent-message',
+        name: 'message',
+        value: cookieConsent.message,
+        placeholder: "This website uses cookies to improve your experience."|t('app'),
+        required: true,
+        errors: cookieConsent.getErrors('message'),
+    }) }}
+
+    {{ forms.textField({
+        label: "Dismiss"|t('app'),
+        id: 'cookieconsent-dismiss',
+        name: 'dismiss',
+        value: cookieConsent.dismiss,
+        placeholder: "Got it!"|t('app'),
+        required: true,
+        errors: cookieConsent.getErrors('dismiss'),
+    }) }}
+
+    {{ forms.textField({
+        label: "Allow"|t('app'),
+        id: 'cookieconsent-allow',
+        name: 'allow',
+        value: cookieConsent.allow,
+        placeholder: "Allow cookies"|t('app'),
+        required: true,
+        errors: cookieConsent.getErrors('allow'),
+    }) }}
+
+    {{ forms.textField({
+        label: "Deny"|t('app'),
+        id: 'cookieconsent-deny',
+        name: 'deny',
+        value: cookieConsent.deny,
+        placeholder: "Decline"|t('app'),
+        required: true,
+        errors: cookieConsent.getErrors('deny'),
+    }) }}
+
+    {{ forms.textField({
+        label: "Policy"|t('app'),
+        id: 'cookieconsent-policy',
+        name: 'policy',
+        value: cookieConsent.policy,
+        placeholder: "Cookie Policy"|t('app'),
+        required: true,
+        errors: cookieConsent.getErrors('policy'),
+    }) }}
+
+    {{ forms.textField({
+        label: "Link"|t('app'),
+        id: 'cookieconsent-link',
+        name: 'link',
+        value: cookieConsent.link,
+        placeholder: "Learn more"|t('app'),
+        required: true,
+        errors: cookieConsent.getErrors('link'),
+    }) }}
+
+    {{ forms.elementSelectField({
+        label: "Cookie policy entry"|t('app'),
+        id: 'cookieconsent-entityId',
+        name: 'entityId',
+        criteria: {'site': currentSite},
+        elements: [cookieConsent.entity],
+        elementType: 'craft\\elements\\Entry',
+        limit: 1,
+        errors: cookieConsent.getErrors('entityId'),
+    }) }}
+
+{% endblock %}

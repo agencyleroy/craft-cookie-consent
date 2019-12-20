@@ -1,0 +1,37 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.selectField({
+    label: "Type"|t('app'),
+    id: 'cookieconsent-type',
+    name: 'type',
+    value: settings.type,
+    required: true,
+    errors: settings.getErrors('type'),
+    options: {
+        'info': "Info"|t('app'),
+        'opt-in': "Opt in"|t('app'),
+        'opt-out': "Opt out"|t('app'),
+    }
+}) }}
+
+{{ forms.textareaField({
+    label: "White list"|t('app'),
+    id: 'cookieconsent-whitelist',
+    name: 'whitelist',
+    value: settings.whitelist,
+    errors: settings.getErrors('whitelist'),
+    placeholder: craft.app.sites.currentSite.baseUrl|replace('/(https*\:\\/\\/)/', '')|replace('/', ''),
+    instructions: 'Whitelisted domains'|t('app'),
+    rows: 5
+}) }}
+
+{{ forms.textareaField({
+    label: "Black list"|t('app'),
+    id: 'cookieconsent-blacklist',
+    name: 'blacklist',
+    value: settings.blacklist,
+    errors: settings.getErrors('blacklist'),
+    placeholder: 'www.google-analytics.com \npiwik.php \ncdn.mxpnl.com',
+    instructions: 'Blacklisted domains'|t('app'),
+    rows: 5
+}) }}
