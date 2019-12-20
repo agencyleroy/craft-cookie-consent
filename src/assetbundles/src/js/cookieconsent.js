@@ -1,14 +1,6 @@
 import 'cookieconsent';
 import { unblock } from 'yett';
 
-const cookieName = 'cookieconsent_status';
-
-const cookieConsentStatus = cookieconsent.utils.getCookie(cookieName);
-
-if (cookieConsentStatus == 'allow' || cookieConsentStatus == 'dismiss') {
-    unblock();
-}
-
 class CookieConsent {
     constructor(CC, settings) {
         CC.initialise({
@@ -25,26 +17,16 @@ class CookieConsent {
                 policy: settings.policy,
                 target: '_blank',
             },
-            cookie: {
-                name: cookieName,
-            },
             type: settings.type,
-            onInitialise: (status) => this.onInitialise(status),
-            onStatusChange: (status, chosenBefore) => this.onStatusChange(status, chosenBefore),
+            onInitialise: function(status) {
+                if (this.hasConsented()) {
+                    unblock();
+                }
+            },
+            onStatusChange: function(status, chosenBefore) {
+                location.reload();
+            }
         })
-    }
-
-    onInitialise(status) {
-        if (status == 'allow' || status == 'dismiss') {
-            unblock();
-        }
-    }
-
-    onStatusChange(status, chosenBefore) {
-        if (status == 'allow' || status == 'dismiss') {
-            unblock();
-            location.reload();
-        }
     }
 }
 

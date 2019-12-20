@@ -1,20 +1,4 @@
-@import '~cookieconsent/src/styles/base.css';
-@import '~cookieconsent/src/styles/layout.css';
-@import '~cookieconsent/src/styles/media.css';
-@import '~cookieconsent/src/styles/animation.css';
-
-.cc-banner {
-    background: inherit;
-    box-shadow: 0 0px 10px 0px rgba(0, 0, 0, 0.1);
-}
-
-.cc-animate.cc-revoke {
-    background: inherit;
-    box-shadow: 0 0px 10px 0px rgba(0, 0, 0, 0.1);
-    opacity: 0.5;
-    transition: opacity 1s ease, transform 1s ease;
-
-    &:hover {
-        opacity: 1;
-    }
-}
+// @import '~cookieconsent/src/styles/base.css';
+// @import '~cookieconsent/src/styles/layout.css';
+// @import '~cookieconsent/src/styles/media.css';
+// @import '~cookieconsent/src/styles/animation.css';

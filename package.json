@@ -8,6 +8,7 @@
     },
     "license": "SEE LICENSE IN LICENSE.md",
     "devDependencies": {
+        "cookieconsent": "^3.1.1",
         "laravel-mix": "^5.0.1",
         "resolve-url-loader": "^3.1.0",
         "sass": "^1.23.3",
@@ -15,9 +16,7 @@
         "vue-template-compiler": "^2.6.10",
         "yett": "^0.1.10"
     },
-    "dependencies": {
-        "cookieconsent": "^3.1.1"
-    },
+    "dependencies": {},
     "scripts": {
         "dev": "npm run development",
         "development": "NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
