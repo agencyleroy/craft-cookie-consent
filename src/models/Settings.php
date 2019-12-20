@@ -13,15 +13,15 @@ class Settings extends Model
     /**
      *
      */
-    public $type;
+    public $type = 'info';
 
     /**
      *
      */
-    public $whitelist;
+    public $whitelist = '';
 
     /**
      *
      */
-    public $blacklist;
+    public $blacklist = '';
 }

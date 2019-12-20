@@ -25,17 +25,21 @@ class CookieConsentService extends Component
             $site = Craft::$app->sites->currentSite;
         }
 
+        $content = [];
+
         $cookieConsent = CookieConsentRecord::findOne(['siteId' => $site->id]);
 
-        $content = $cookieConsent->toArray([
-            'header',
-            'message',
-            'dismiss',
-            'allow',
-            'deny',
-            'policy',
-            'link',
-        ], ['href']);
+        if ($cookieConsent) {
+            $content = $cookieConsent->toArray([
+                'header',
+                'message',
+                'dismiss',
+                'allow',
+                'deny',
+                'policy',
+                'link',
+            ], ['href']);
+        }
 
         $settings = Plugin::getInstance()->getSettings()->toArray(['type']);
 
