@@ -14,7 +14,7 @@
         "sass": "^1.23.3",
         "sass-loader": "^7.2.0",
         "vue-template-compiler": "^2.6.10",
-        "yett": "^0.1.10"
+        "yett": "^0.1.11"
     },
     "dependencies": {},
     "scripts": {

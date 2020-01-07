@@ -1,5 +1,6 @@
+let yett = require('yett');
+
 import 'cookieconsent';
-import { unblock } from 'yett';
 
 class CookieConsent {
     constructor(CC, settings) {
@@ -20,7 +21,7 @@ class CookieConsent {
             type: settings.type,
             onInitialise: function(status) {
                 if (this.hasConsented()) {
-                    unblock();
+                    yett.unblock();
                 }
             },
             onStatusChange: function(status, chosenBefore) {
