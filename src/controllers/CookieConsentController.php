@@ -2,10 +2,11 @@
 
 namespace agencyleroy\craftcookieconsent\controllers;
 
-use Craft;
-use craft\web\Controller;
 use agencyleroy\craftcookieconsent\Plugin;
 use agencyleroy\craftcookieconsent\records\CookieConsentRecord;
+
+use Craft;
+use craft\web\Controller;
 
 /**
  *

@@ -3,6 +3,7 @@
 namespace agencyleroy\craftcookieconsent\web\twig;
 
 use agencyleroy\craftcookieconsent\web\twig\nodevisitors\EventTagAdder;
+
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -34,7 +35,7 @@ class Extension extends AbstractExtension
     }
 
     /**
-     *
+     * Output beginning of the head section.
      */
     public function beginHead()
     {

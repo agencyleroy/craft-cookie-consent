@@ -14,24 +14,42 @@
     }
 }) }}
 
-{{ forms.textareaField({
-    label: "White list"|t('app'),
-    id: 'cookieconsent-whitelist',
-    name: 'whitelist',
-    value: settings.whitelist,
-    errors: settings.getErrors('whitelist'),
-    placeholder: craft.app.sites.currentSite.baseUrl|replace('/(https*\:\\/\\/)/', '')|replace('/', ''),
-    instructions: 'Whitelisted domains'|t('app'),
-    rows: 5
-}) }}
+<strong>{{ "Whitelist or blacklist"|t('app') }}</strong>
+<p>{{ "Add a list of script sources that should be blocked initially. Whitelist blocks all scripts not included in the list. Blacklist blocks all scripts included in the list." }}</p>
+<div class="field">
+    <label>
+        {{ forms.radio({
+            name: 'whiteorblacklist',
+            value: 1,
+            checked: settings.whiteorblacklist == 1,
+        }) }}
 
-{{ forms.textareaField({
-    label: "Black list"|t('app'),
-    id: 'cookieconsent-blacklist',
-    name: 'blacklist',
-    value: settings.blacklist,
-    errors: settings.getErrors('blacklist'),
-    placeholder: 'www.google-analytics.com \npiwik.php \ncdn.mxpnl.com',
-    instructions: 'Blacklisted domains'|t('app'),
-    rows: 5
-}) }}
+        {{ "White list"|t('app') }}
+    </label>
+
+    {{ forms.textarea({
+        name: 'whitelist',
+        value: settings.whitelist,
+        placeholder: craft.app.sites.currentSite.baseUrl|replace('/(https*\:\\/\\/)/', '')|replace('/', ''),
+        rows: 5
+    }) }}
+</div>
+
+<div class="field">
+    <label>
+        {{ forms.radio({
+            name: 'whiteorblacklist',
+            value: 2,
+            checked: settings.whiteorblacklist == 2,
+        }) }}
+
+        {{ "Black list"|t('app') }}
+    </label>
+
+    {{ forms.textarea({
+        name: 'blacklist',
+        value: settings.blacklist,
+        placeholder: 'www.google-analytics.com \npiwik.php \ncdn.mxpnl.com',
+        rows: 5
+    }) }}
+</div>

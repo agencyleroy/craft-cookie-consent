@@ -17,12 +17,12 @@ class CookieConsentRecord extends ActiveRecord
     }
 
     /**
-     *
+     * Entry|null
      */
     private $_entity;
 
     /**
-     *
+     * Url|null
      */
     private $_href;
 

@@ -7,6 +7,7 @@ use agencyleroy\craftcookieconsent\services\CookieConsentService;
 use agencyleroy\craftcookieconsent\assetbundles\CookieConsentAsset;
 use agencyleroy\craftcookieconsent\records\CookieConsentRecord;
 use agencyleroy\craftcookieconsent\web\twig\Extension;
+use agencyleroy\craftcookieconsent\helpers\Dom;
 
 use Craft;
 use yii\base\Event;
@@ -65,7 +66,7 @@ class Plugin extends \craft\base\Plugin
     }
 
     /**
-     *
+     * Registers Control panel URL rules.
      */
     public function _registerCpUrlRules()
     {
@@ -79,7 +80,7 @@ class Plugin extends \craft\base\Plugin
     }
 
     /**
-     *
+     * Register Control panel navigation items.
      */
     private function _registerCpNavItems()
     {
@@ -96,23 +97,20 @@ class Plugin extends \craft\base\Plugin
     }
 
     /**
-     *
+     * Register assets for the cookie compilance banner on site requests.
      */
     private function _showCookieCompilance()
     {
         if (Craft::$app->request->isSiteRequest) {
             $cookieConsentSettings = Plugin::getInstance()->cookieconsent->getCookieConsentSettings();
-            $blackListSettings = Plugin::getInstance()->cookieconsent->getBlackList();
-            $whiteListSettings = Plugin::getInstance()->cookieconsent->getWhiteList();
+            $whiteOrBlackList = Plugin::getInstance()->cookieconsent->getWhiteOrBlackList();
 
             Craft::$app->getView()->registerJsVar('COOKIE_CONSENT_SETTINGS', $cookieConsentSettings, Extension::POS_HEAD_BEGIN);
 
-            if ($blackListSettings) {
-                Craft::$app->getView()->registerJs("var YETT_BLACKLIST = $blackListSettings ;", Extension::POS_HEAD_BEGIN);
-            }
-
-            if ($whiteListSettings) {
-                Craft::$app->getView()->registerJs("var YETT_WHITELIST = $whiteListSettings ;", Extension::POS_HEAD_BEGIN);
+            if ($whiteOrBlackList) {
+                $name = $whiteOrBlackList['name'];
+                $value = $whiteOrBlackList['value'];
+                Craft::$app->getView()->registerJs("var $name = $value ;", Extension::POS_HEAD_BEGIN);
             }
 
             Craft::$app->getView()->registerAssetBundle(CookieConsentAsset::class);
@@ -120,7 +118,11 @@ class Plugin extends \craft\base\Plugin
     }
 
     /**
+     * Register view events.
      *
+     * This includes:
+     * - Return JS code registered with [[registerJs()]] with the position set to [[POS_HEAD_BEGIN]].
+     * - Set type attribute to `javascript/blocked` for script tags with a src to blacklisted domains.
      */
     private function _viewEvents()
     {
@@ -129,10 +131,38 @@ class Plugin extends \craft\base\Plugin
                 Extension::PH_HEAD_BEGIN => $this->_renderCookieJs($event->sender),
             ]);
         });
+
+        Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE, function($event) {
+            $whiteOrBlackList = Plugin::getInstance()->cookieconsent->getWhiteOrBlackList(false);
+
+            if ($whiteOrBlackList) {
+                $html = $event->output;
+
+                $dom = Dom::loadHtml($html);
+
+                foreach ($dom->getElementsByTagName('script') as $script) {
+                    $src = $script->getAttribute('src');
+
+                    if ($whiteOrBlackList['whiteOrBlack'] == Settings::WHITELIST) {
+                        if ($src && !preg_match($whiteOrBlackList['value'], $src)) {
+                            $script->setAttribute('type', 'javascript/blocked');
+                        }
+                    }
+
+                    if ($whiteOrBlackList['whiteOrBlack'] == Settings::BLACKLIST) {
+                        if ($src && preg_match($whiteOrBlackList['value'], $src)) {
+                            $script->setAttribute('type', 'javascript/blocked');
+                        }
+                    }
+                }
+
+                $event->output = $dom->saveHTML();
+            }
+        });
     }
 
     /**
-     *
+     * Returns the content to be inserted at the beginning of the head section.
      */
     private function _renderCookieJs(View $view)
     {
