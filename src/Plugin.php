@@ -143,13 +143,13 @@ class Plugin extends \craft\base\Plugin
                 foreach ($dom->getElementsByTagName('script') as $script) {
                     $src = $script->getAttribute('src');
 
-                    if ($whiteOrBlackList['whiteOrBlack'] == Settings::WHITELIST) {
+                    if ($whiteOrBlackList['whiteOrBlack'] == Settings::WHITELIST && $whiteOrBlackList['value']) {
                         if ($src && !preg_match($whiteOrBlackList['value'], $src)) {
                             $script->setAttribute('type', 'javascript/blocked');
                         }
                     }
 
-                    if ($whiteOrBlackList['whiteOrBlack'] == Settings::BLACKLIST) {
+                    if ($whiteOrBlackList['whiteOrBlack'] == Settings::BLACKLIST && $whiteOrBlackList['value']) {
                         if ($src && preg_match($whiteOrBlackList['value'], $src)) {
                             $script->setAttribute('type', 'javascript/blocked');
                         }
