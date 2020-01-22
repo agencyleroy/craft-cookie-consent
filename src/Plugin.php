@@ -132,33 +132,35 @@ class Plugin extends \craft\base\Plugin
             ]);
         });
 
-        Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE, function($event) {
-            $whiteOrBlackList = Plugin::getInstance()->cookieconsent->getWhiteOrBlackList(false);
+        if (Craft::$app->request->isSiteRequest) {
+            Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE, function($event) {
+                $whiteOrBlackList = Plugin::getInstance()->cookieconsent->getWhiteOrBlackList(false);
 
-            if ($whiteOrBlackList) {
-                $html = $event->output;
+                if ($whiteOrBlackList) {
+                    $html = $event->output;
 
-                $dom = Dom::loadHtml($html);
+                    $dom = Dom::loadHtml($html);
 
-                foreach ($dom->getElementsByTagName('script') as $script) {
-                    $src = $script->getAttribute('src');
+                    foreach ($dom->getElementsByTagName('script') as $script) {
+                        $src = $script->getAttribute('src');
 
-                    if ($whiteOrBlackList['whiteOrBlack'] == Settings::WHITELIST && $whiteOrBlackList['value']) {
-                        if ($src && !preg_match($whiteOrBlackList['value'], $src)) {
-                            $script->setAttribute('type', 'javascript/blocked');
+                        if ($whiteOrBlackList['whiteOrBlack'] == Settings::WHITELIST && $whiteOrBlackList['value']) {
+                            if ($src && !preg_match($whiteOrBlackList['value'], $src)) {
+                                $script->setAttribute('type', 'javascript/blocked');
+                            }
+                        }
+
+                        if ($whiteOrBlackList['whiteOrBlack'] == Settings::BLACKLIST && $whiteOrBlackList['value']) {
+                            if ($src && preg_match($whiteOrBlackList['value'], $src)) {
+                                $script->setAttribute('type', 'javascript/blocked');
+                            }
                         }
                     }
 
-                    if ($whiteOrBlackList['whiteOrBlack'] == Settings::BLACKLIST && $whiteOrBlackList['value']) {
-                        if ($src && preg_match($whiteOrBlackList['value'], $src)) {
-                            $script->setAttribute('type', 'javascript/blocked');
-                        }
-                    }
+                    $event->output = Dom::saveHtml($dom);
                 }
-
-                $event->output = $dom->saveHTML();
-            }
-        });
+            });
+        }
     }
 
     /**
