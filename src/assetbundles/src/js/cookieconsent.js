@@ -18,6 +18,7 @@ class CookieConsent {
                 policy: settings.policy,
                 target: '_blank',
             },
+            window: '<div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window {{classes}}"><div class="cc-content-container"><!--googleoff: all-->{{children}}<!--googleon: all--></div></div>',
             type: settings.type,
             onInitialise: function(status) {
                 if (this.hasConsented()) {
