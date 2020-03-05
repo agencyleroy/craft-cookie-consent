@@ -46,7 +46,7 @@ class CookieConsentService extends Component
             ], ['href']);
         }
 
-        $settings = Plugin::getInstance()->getSettings()->toArray(['type']);
+        $settings = Plugin::getInstance()->getSettings()->toArray(['type', 'cookieName', 'cookieExpiryDays']);
 
         return ArrayHelper::merge($content, $settings);
     }

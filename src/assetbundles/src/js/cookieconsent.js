@@ -6,6 +6,10 @@ class CookieConsent {
     constructor(CC, settings) {
         CC.initialise({
             revokable: true,
+            cookie: {
+                name: settings.cookieName,
+                expiryDays: settings.cookieExpiryDays,
+            },
             content: {
                 header: settings.header,
                 message: settings.message,

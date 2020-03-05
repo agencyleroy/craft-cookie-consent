@@ -14,42 +14,72 @@
     }
 }) }}
 
-<strong>{{ "Whitelist or blacklist"|t('app') }}</strong>
-<p>{{ "Add a list of script sources that should be blocked initially. Whitelist blocks all scripts not included in the list. Blacklist blocks all scripts included in the list." }}</p>
+{{ forms.textField({
+    label: "Cookie name"|t('app'),
+    id: 'cookieconsent-cookie-name',
+    name: 'cookieName',
+    value: settings.cookieName,
+    required: true,
+    errors: settings.getErrors('cookieName'),
+    instructions: "Name of the cookie that keeps track of users choice."|t('app'),
+}) }}
+
+{{ forms.textField({
+    label: "Cookie expiry days"|t('app'),
+    id: 'cookieconsent-cookie-expiry-days',
+    name: 'cookieExpiryDays',
+    value: settings.cookieExpiryDays,
+    required: true,
+    errors: settings.getErrors('cookieExpiryDays'),
+    type: 'number',
+    min: '-1',
+    max: '365',
+    instructions: "The cookies expire date, specified in days."|t('app'),
+}) }}
+
 <div class="field">
-    <label>
-        {{ forms.radio({
-            name: 'whiteorblacklist',
-            value: 1,
-            checked: settings.whiteorblacklist == 1,
+    <div class="heading">
+        <label>{{ "Whitelist or blacklist"|t('app') }}</label>
+    </div>
+    <div class="instructions">
+        <p>{{ "Add a list of script sources that should be blocked initially. Whitelist blocks all scripts not included in the list. Blacklist blocks all scripts included in the list."|t }}</p>
+    </div>
+
+    <div class="field">
+        <label>
+            {{ forms.radio({
+                name: 'whiteorblacklist',
+                value: 1,
+                checked: settings.whiteorblacklist == 1,
+            }) }}
+
+            {{ "White list"|t('app') }}
+        </label>
+
+        {{ forms.textarea({
+            name: 'whitelist',
+            value: settings.whitelist,
+            placeholder: craft.app.sites.currentSite.baseUrl|replace('/(https*\:\\/\\/)/', '')|replace('/', ''),
+            rows: 5
         }) }}
+    </div>
 
-        {{ "White list"|t('app') }}
-    </label>
+    <div class="field">
+        <label>
+            {{ forms.radio({
+                name: 'whiteorblacklist',
+                value: 2,
+                checked: settings.whiteorblacklist == 2,
+            }) }}
 
-    {{ forms.textarea({
-        name: 'whitelist',
-        value: settings.whitelist,
-        placeholder: craft.app.sites.currentSite.baseUrl|replace('/(https*\:\\/\\/)/', '')|replace('/', ''),
-        rows: 5
-    }) }}
-</div>
+            {{ "Black list"|t('app') }}
+        </label>
 
-<div class="field">
-    <label>
-        {{ forms.radio({
-            name: 'whiteorblacklist',
-            value: 2,
-            checked: settings.whiteorblacklist == 2,
+        {{ forms.textarea({
+            name: 'blacklist',
+            value: settings.blacklist,
+            placeholder: 'www.google-analytics.com \npiwik.php \ncdn.mxpnl.com',
+            rows: 5
         }) }}
-
-        {{ "Black list"|t('app') }}
-    </label>
-
-    {{ forms.textarea({
-        name: 'blacklist',
-        value: settings.blacklist,
-        placeholder: 'www.google-analytics.com \npiwik.php \ncdn.mxpnl.com',
-        rows: 5
-    }) }}
+    </div>
 </div>
