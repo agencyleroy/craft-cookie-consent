@@ -126,41 +126,25 @@ class Plugin extends \craft\base\Plugin
      */
     private function _viewEvents()
     {
-        Event::on(View::class, View::EVENT_AFTER_RENDER_TEMPLATE, function($event) {
-            $event->output = strtr($event->output, [
-                Extension::PH_HEAD_BEGIN => $this->_renderCookieJs($event->sender),
-            ]);
-        });
+        Event::on(
+            View::class,
+            View::EVENT_AFTER_RENDER_TEMPLATE,
+            function (Event $event) {
+                $event->output = strtr($event->output, [
+                    Extension::PH_HEAD_BEGIN => $this->_renderCookieJs($event->sender),
+                ]);
+            }
+        );
 
-        if (Craft::$app->request->isSiteRequest) {
-            Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE, function($event) {
-                $whiteOrBlackList = Plugin::getInstance()->cookieconsent->getWhiteOrBlackList(false);
+        Event::on(
+            View::class,
+            View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
+            function(Event $event) {
+                if (!Craft::$app->request->isSiteRequest) return $event->output;
 
-                if ($whiteOrBlackList) {
-                    $html = $event->output;
-
-                    $dom = Dom::loadHtml($html);
-
-                    foreach ($dom->getElementsByTagName('script') as $script) {
-                        $src = $script->getAttribute('src');
-
-                        if ($whiteOrBlackList['whiteOrBlack'] == Settings::WHITELIST && $whiteOrBlackList['value']) {
-                            if ($src && !preg_match($whiteOrBlackList['value'], $src)) {
-                                $script->setAttribute('type', 'javascript/blocked');
-                            }
-                        }
-
-                        if ($whiteOrBlackList['whiteOrBlack'] == Settings::BLACKLIST && $whiteOrBlackList['value']) {
-                            if ($src && preg_match($whiteOrBlackList['value'], $src)) {
-                                $script->setAttribute('type', 'javascript/blocked');
-                            }
-                        }
-                    }
-
-                    $event->output = Dom::saveHtml($dom);
-                }
-            });
-        }
+                $event->output = self::blockScripts($event->output);
+            }
+        );
     }
 
     /**
@@ -179,5 +163,83 @@ class Plugin extends \craft\base\Plugin
         }
 
         return empty($lines) ? '' : implode("\n", $lines);
+    }
+
+    /**
+     * Find script tags with src attributes that match the white or blacklist
+     * and add a type="javascript/blocked" attribute.
+     *
+     * @param string $html The html for the page being rendered.
+     * @return string
+     */
+    protected static function blockScripts(string $html)
+    {
+        $html = preg_replace_callback(
+            '/<script\b[^>]*src="(?<src>[^"]*)"[^>]?>/',
+            ['self', 'blockScript'],
+            $html
+        );
+
+        return $html;
+    }
+
+    /**
+     * Filter script tags based on their src attribute.
+     *
+     * @param array $matches Regex matches containing a script tag and src attribute.
+     * @return string
+     */
+    protected static function blockScript(array $matches): string
+    {
+        $script = $matches[0];
+        $src = $matches['src'];
+
+        // Exit early for cookie consent script
+        if (preg_match('/cookieconsent\.js/', $src)) return $script;
+
+        $whiteOrBlackList = Plugin::getInstance()->cookieconsent->getWhiteOrBlackList(false);
+
+        // Find scripts not included in the whitelist
+        if ($whiteOrBlackList['whiteOrBlack'] == Settings::WHITELIST && $whiteOrBlackList['value']) {
+            if ($src && !preg_match($whiteOrBlackList['value'], $src)) {
+                $script = self::addReplaceType($script);
+            }
+        }
+
+        // Find scripts included in the blacklist
+        if ($whiteOrBlackList['whiteOrBlack'] == Settings::BLACKLIST && $whiteOrBlackList['value']) {
+            if ($src && preg_match($whiteOrBlackList['value'], $src)) {
+                $script = self::addReplaceType($script);
+            }
+        }
+
+        return $script;
+    }
+
+    /**
+     * Add or replace the src attribute with "javascript/blocked".
+     *
+     * @param string $script The script tag that should be blocked.
+     * @return string
+     */
+    protected static function addReplaceType(string $script)
+    {
+        // Find a type attribute to replace
+        if (preg_match('/(?<type>type="[^"]*")/', $script, $matches, PREG_OFFSET_CAPTURE)) {
+            $startPos = $matches['type'][1];
+            $endPos = $startPos + strlen($matches['type'][0]);
+        }
+        // Add the type attribute on the first whitespace
+        else {
+            $startPos = strpos($script, ' ') + 1;
+            $endPos = $startPos - 1;
+        }
+
+        $preSplitHtml = substr($script, 0, $startPos);
+        $postSplitHtml = substr($script, $endPos);
+
+        $script = $preSplitHtml . 'type="javascript/blocked"' . $postSplitHtml;
+
+        return $script;
     }
 }
