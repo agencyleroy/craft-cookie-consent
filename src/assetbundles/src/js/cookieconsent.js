@@ -22,15 +22,29 @@ class CookieConsent {
                 policy: settings.policy,
                 target: '_blank',
             },
-            window: '<div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window {{classes}}"><div class="cc-content-container"><!--googleoff: all-->{{children}}<!--googleon: all--></div></div>',
+            window: `
+                <div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window {{classes}}">
+                    <div class="cc-content-container"><!--googleoff: all-->{{children}}<!--googleon: all--></div>
+                </div>
+            `,
             type: settings.type,
+            onPopupOpen: function() {
+                document.body.classList.add('cookie-banner-open');
+            },
+            onPopupClose: function() {
+                document.body.classList.remove('cookie-banner-open');
+            },
             onInitialise: function(status) {
                 if (this.hasConsented()) {
                     yett.unblock();
                 }
             },
             onStatusChange: function(status, chosenBefore) {
-                location.reload();
+                if (this.hasConsented()) {
+                    yett.unblock();
+                } else {
+                    location.reload();
+                }
             }
         })
     }
